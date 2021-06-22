@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">ToDo</string>
+
+    <!--  common  -->
+    <string name="add_button_description">Add</string>
+
+    <!--  fragment_to_do_list  -->
+    <string name="to_do_list_title">To-do list</string>
 </resources>
