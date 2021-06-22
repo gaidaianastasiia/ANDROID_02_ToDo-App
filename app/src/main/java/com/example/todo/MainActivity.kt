@@ -1,11 +1,13 @@
-package com.example.todo
+package com.example.todo.presentation.activity
 
-import androidx.appcompat.app.AppCompatActivity
-import android.os.Bundle
+import android.view.LayoutInflater
+import com.example.todo.databinding.ActivityMainBinding
+import com.example.todo.presentation.base.BaseActivity
+import kotlin.reflect.KClass
 
-class MainActivity : AppCompatActivity() {
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-    }
+class MainActivity : BaseActivity<MainViewModel, MainViewModel.Factory, ActivityMainBinding>() {
+    override val viewModelClass: KClass<MainViewModel> = MainViewModel::class
+
+    override fun createViewBinding(inflater: LayoutInflater): ActivityMainBinding =
+        ActivityMainBinding.inflate(inflater)
 }

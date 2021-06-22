@@ -1,16 +1,14 @@
 package com.example.todo.di.component
 
 import com.example.todo.Application
-import com.example.todo.di.module.ApplicationModule
-import com.example.todo.di.module.RepositoryModule
-import com.example.todo.di.module.StorageModule
-import com.example.todo.di.module.ViewModelFactoryModule
+import com.example.todo.di.module.*
 import dagger.Component
 import dagger.android.AndroidInjector
 import dagger.android.support.AndroidSupportInjectionModule
 import javax.inject.Singleton
 
 @Component(modules = [
+    ActivityModule::class,
     ApplicationModule::class,
     AndroidSupportInjectionModule::class,
     ViewModelFactoryModule::class,
