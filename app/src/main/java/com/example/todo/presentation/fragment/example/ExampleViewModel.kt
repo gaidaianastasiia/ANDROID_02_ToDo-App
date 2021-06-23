@@ -10,6 +10,7 @@ import dagger.assisted.AssistedInject
 
 class ExampleViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
+    @Assisted someData: String,
     private val deleteToDoInteractor: DeleteToDoInteractor
 ): BaseViewModel(savedStateHandle) {
     @AssistedFactory
