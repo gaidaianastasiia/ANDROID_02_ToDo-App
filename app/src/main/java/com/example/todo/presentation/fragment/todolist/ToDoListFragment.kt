@@ -7,7 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import com.example.todo.databinding.FragmentToDoListBinding
 
-class ToDoListFragment : Fragment() {
+class ToDoListFragment : ToDoAdapter.ToDoAdapterListener, Fragment() {
     private var _binding: FragmentToDoListBinding? = null
     private val binding get() = _binding!!
 
@@ -22,5 +22,13 @@ class ToDoListFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    override fun onToDoClick(id: Long, text: String) {
+        TODO("Not yet implemented")
+    }
+
+    override fun onToDoLongClick(id: Long) {
+        TODO("Not yet implemented")
     }
 }
