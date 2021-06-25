@@ -18,7 +18,7 @@ abstract class BaseFragment<VM: BaseViewModel, VMAF: ViewModelAssistedFactory<VM
 
     protected abstract val viewModelClass: KClass<VM>
 
-    private var viewBinding: VB? = null
+    protected var viewBinding: VB? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
