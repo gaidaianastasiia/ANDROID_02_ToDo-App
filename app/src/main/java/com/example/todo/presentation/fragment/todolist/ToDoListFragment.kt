@@ -1,27 +1,27 @@
 package com.example.todo.presentation.fragment.todolist
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.databinding.FragmentToDoListBinding
+import com.example.todo.presentation.base.BaseFragment
+import kotlin.reflect.KClass
 
-class ToDoListFragment : ToDoAdapter.ToDoAdapterListener, Fragment() {
-    private var _binding: FragmentToDoListBinding? = null
-    private val binding get() = _binding!!
+class ToDoListFragment :
+    BaseFragment<ToDoListViewModel, ToDoListViewModel.Factory, FragmentToDoListBinding>(),
+    ToDoAdapter.ToDoAdapterListener {
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentToDoListBinding.inflate(inflater, container, false)
-        return binding.root
-    }
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+        val recyclerView = viewBinding?.listRecyclerView
+        val adapter = ToDoAdapter(this)
+        viewModel.list.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+        recyclerView?.adapter = adapter
     }
 
     override fun onToDoClick(id: Long, text: String) {
@@ -31,4 +31,11 @@ class ToDoListFragment : ToDoAdapter.ToDoAdapterListener, Fragment() {
     override fun onToDoLongClick(id: Long) {
         TODO("Not yet implemented")
     }
+
+    override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class
+
+    override fun createViewBinding(
+        inflater: LayoutInflater,
+        parent: ViewGroup?
+    ): FragmentToDoListBinding = FragmentToDoListBinding.inflate(inflater, parent, false)
 }

@@ -1,16 +1,20 @@
 package com.example.todo.presentation.fragment.todolist
 
 import android.content.Context
-import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.ViewModel
 import com.example.todo.databinding.FragmentToDoControlsBinding
+import com.example.todo.presentation.base.BaseBottomSheetFragment
+import com.example.todo.presentation.fragment.example.ExampleFragment
+import kotlin.reflect.KClass
 
+private const val NO_LISTENER_EXCEPTION_MESSAGE = " must implement ToDoControlsFragmentListener"
+private const val ID_ARGUMENT_KEY = "ID_ARGUMENT_KEY"
 
-class ToDoControlsFragment : Fragment() {
-    private lateinit var binding: FragmentToDoControlsBinding
+class ToDoControlsFragment :
+    BaseBottomSheetFragment<ToDoControlsViewModel, ToDoControlsViewModel.Factory, FragmentToDoControlsBinding>() {
     lateinit var controlsFragmentListener: ToDoControlsFragmentListener
 
     interface ToDoControlsFragmentListener {
@@ -30,16 +34,23 @@ class ToDoControlsFragment : Fragment() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        binding = FragmentToDoControlsBinding.inflate(inflater)
-        return binding.root
+    companion object {
+        fun getInstance(id: Long) = ExampleFragment().apply {
+            arguments?.putLong(ID_ARGUMENT_KEY, id)
+        }
     }
 
-    companion object {
-        private const val NO_LISTENER_EXCEPTION_MESSAGE =
-            " must implement ToDoControlsFragmentListener"
+    override val viewModelClass: KClass<ToDoControlsViewModel> = ToDoControlsViewModel::class
+
+    override fun viewModelFactory(): (SavedStateHandle) -> ViewModel = { savedStateHandle ->
+        viewModelAssistedFactory.create(
+            savedStateHandle,
+            requireArguments().getLong(ID_ARGUMENT_KEY)
+        )
     }
+
+    override fun createViewBinding(
+        inflater: LayoutInflater,
+        parent: ViewGroup?
+    ): FragmentToDoControlsBinding = FragmentToDoControlsBinding.inflate(inflater, parent, false)
 }

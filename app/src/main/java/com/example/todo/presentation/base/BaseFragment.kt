@@ -49,4 +49,9 @@ abstract class BaseFragment<VM: BaseViewModel, VMAF: ViewModelAssistedFactory<VM
             }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        viewBinding = null
+    }
 }
