@@ -9,12 +9,13 @@ import androidx.fragment.app.add
 import com.example.todo.R
 import com.example.todo.databinding.ActivityMainBinding
 import com.example.todo.presentation.base.BaseActivity
+import com.example.todo.presentation.fragment.example.ExampleFragment
 import com.example.todo.presentation.fragment.todolist.ToDoListFragment
 import kotlin.reflect.KClass
 
 class MainActivity : BaseActivity<MainViewModel, MainViewModel.Factory, ActivityMainBinding>() {
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
 
         if (savedInstanceState == null) {
             viewModel.onCreate()
@@ -30,12 +31,10 @@ class MainActivity : BaseActivity<MainViewModel, MainViewModel.Factory, Activity
     override fun createViewBinding(inflater: LayoutInflater): ActivityMainBinding =
         ActivityMainBinding.inflate(inflater)
 
-
-
     private fun startToDoFragment() {
         supportFragmentManager.commit {
             setReorderingAllowed(true)
-            add<ToDoListFragment>(R.id.fragmentContainer)
+            add(R.id.fragmentContainer, ExampleFragment())
         }
     }
 }

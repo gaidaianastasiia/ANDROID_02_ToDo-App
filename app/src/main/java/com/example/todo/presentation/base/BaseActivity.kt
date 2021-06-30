@@ -1,8 +1,6 @@
 package com.example.todo.presentation.base
 
 import android.os.Bundle
-import android.os.PersistableBundle
-import android.util.Log
 import android.view.LayoutInflater
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -24,8 +22,8 @@ abstract class BaseActivity<
 
     private var viewBinding: VB? = null
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewBinding = createViewBinding(LayoutInflater.from(this)).also {
             setContentView(it.root)
         }
