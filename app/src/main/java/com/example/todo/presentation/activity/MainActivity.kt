@@ -13,14 +13,8 @@ import com.example.todo.presentation.fragment.todolist.ToDoListFragment
 import kotlin.reflect.KClass
 
 class MainActivity : BaseActivity<MainViewModel, MainViewModel.Factory, ActivityMainBinding>() {
-    override val viewModelClass: KClass<MainViewModel> = MainViewModel::class
-
-    override fun createViewBinding(inflater: LayoutInflater): ActivityMainBinding =
-        ActivityMainBinding.inflate(inflater)
-
     override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
         super.onCreate(savedInstanceState, persistentState)
-        Log.d("###", "onCreate")
 
         if (savedInstanceState == null) {
             viewModel.onCreate()
@@ -31,8 +25,14 @@ class MainActivity : BaseActivity<MainViewModel, MainViewModel.Factory, Activity
         }
     }
 
+    override val viewModelClass: KClass<MainViewModel> = MainViewModel::class
+
+    override fun createViewBinding(inflater: LayoutInflater): ActivityMainBinding =
+        ActivityMainBinding.inflate(inflater)
+
+
+
     private fun startToDoFragment() {
-        Log.d("###", "startToDoFragment")
         supportFragmentManager.commit {
             setReorderingAllowed(true)
             add<ToDoListFragment>(R.id.fragmentContainer)
