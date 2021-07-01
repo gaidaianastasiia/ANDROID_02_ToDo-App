@@ -3,6 +3,13 @@
 
     <!--  common  -->
     <string name="add_button_description">Add</string>
+    <string name="retry_button">Retry</string>
+    <string name="recover_button">Recover</string>
+    <string name="save_button">Save</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="edit_button">Edit</string>
+    <string name="delete_button">Delete</string>
+    <string name="empty_state_message">The list is empty</string>
 
     <!--  fragment_to_do_list  -->
     <string name="to_do_list_title">To-do list</string>

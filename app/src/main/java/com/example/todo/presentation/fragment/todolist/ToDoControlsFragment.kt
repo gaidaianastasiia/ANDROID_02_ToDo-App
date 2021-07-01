@@ -1,7 +1,9 @@
 package com.example.todo.presentation.fragment.todolist
 
 import android.content.Context
+import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -34,8 +36,40 @@ class ToDoControlsFragment :
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setUpViews()
+    }
+
+    private fun setUpViews() {
+        setEditButtonClickListener()
+        setDeleteButtonClickListener()
+    }
+
+    private fun setEditButtonClickListener() {
+        viewBinding?.editToDoTextButton?.setOnClickListener {
+            val id = getListId()
+            id?.let {
+                controlsFragmentListener.onEditButtonClick(it)
+            }
+            dismissAllowingStateLoss()
+        }
+    }
+
+    private fun setDeleteButtonClickListener() {
+        viewBinding?.deleteToDoButton?.setOnClickListener {
+            val id = getListId()
+            id?.let {
+                controlsFragmentListener.onDeleteButtonClick(id)
+            }
+            dismissAllowingStateLoss()
+        }
+    }
+
+    private fun getListId() = arguments?.getLong(ID_ARGUMENT_KEY)
+
     companion object {
-        fun getInstance(id: Long) = ExampleFragment().apply {
+        fun getInstance(id: Long) = ToDoControlsFragment().apply {
             arguments?.putLong(ID_ARGUMENT_KEY, id)
         }
     }

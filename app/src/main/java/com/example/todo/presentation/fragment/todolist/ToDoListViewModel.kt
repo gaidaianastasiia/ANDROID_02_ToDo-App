@@ -10,6 +10,7 @@ import com.example.todo.entity.ToDo
 import com.example.todo.presentation.base.BaseViewModel
 import com.example.todo.presentation.base.BaseViewModelAssistedFactory
 import com.example.todo.presentation.base.ViewModelAssistedFactory
+import com.example.todo.presentation.utils.SingleLiveEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -18,8 +19,7 @@ import kotlinx.coroutines.launch
 
 class ToDoListViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
-    private val getAllToDos: GetAllToDosInteractor,
-    private val getToDoById: GetToDoByIdInteractor
+    private val getAllToDos: GetAllToDosInteractor
 ) : BaseViewModel(savedStateHandle) {
     @AssistedFactory
     interface Factory : BaseViewModelAssistedFactory<ToDoListViewModel>
@@ -28,9 +28,17 @@ class ToDoListViewModel @AssistedInject constructor(
     val list: LiveData<List<ToDo>>
         get() = _list
 
+    private val _controls = MutableLiveData<Long>()
+    val controls: LiveData<Long>
+        get() = _controls
+
     fun onCreate() {
         viewModelScope.launch(Dispatchers.IO) {
-            _list.setValue(getAllToDos.invoke())
+            _list.value = getAllToDos.invoke()
         }
+    }
+
+    fun onControlsListButtonClick(id: Long) {
+        _controls.value = id
     }
 }

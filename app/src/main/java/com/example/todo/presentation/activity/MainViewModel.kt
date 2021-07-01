@@ -23,8 +23,6 @@ class MainViewModel @AssistedInject constructor(
         get() = _startEvent
 
     fun onCreate() {
-        Log.d("###", "MainViewModel onCreate")
-
         _startEvent.call()
     }
 }

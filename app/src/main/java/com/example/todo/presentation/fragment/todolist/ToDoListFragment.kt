@@ -4,10 +4,11 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.databinding.FragmentToDoListBinding
 import com.example.todo.presentation.base.BaseFragment
 import kotlin.reflect.KClass
+
+private const val SHOPPING_LIST_CONTROLS_FRAGMENT_TAG = "ShoppingListsControlsFragment"
 
 class ToDoListFragment :
     BaseFragment<ToDoListViewModel, ToDoListViewModel.Factory, FragmentToDoListBinding>(),
@@ -18,10 +19,17 @@ class ToDoListFragment :
 
         val recyclerView = viewBinding?.listRecyclerView
         val adapter = ToDoAdapter(this)
+        recyclerView?.adapter = adapter
+
         viewModel.list.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
-        recyclerView?.adapter = adapter
+
+        viewModel.controls.observe(viewLifecycleOwner) {
+            showControlsListDialog(it)
+        }
+
+        viewModel.onCreate()
     }
 
     override fun onToDoClick(id: Long, text: String) {
@@ -29,7 +37,12 @@ class ToDoListFragment :
     }
 
     override fun onToDoLongClick(id: Long) {
-        TODO("Not yet implemented")
+        viewModel.onControlsListButtonClick(id)
+    }
+
+    private fun showControlsListDialog(id: Long) {
+        val controlsListDialog = ToDoControlsFragment.getInstance(id)
+        controlsListDialog.show(parentFragmentManager, SHOPPING_LIST_CONTROLS_FRAGMENT_TAG)
     }
 
     override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class
