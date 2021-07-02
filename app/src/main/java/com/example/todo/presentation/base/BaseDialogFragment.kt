@@ -1,5 +1,6 @@
 package com.example.todo.presentation.base
 
+import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,12 +9,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
-import dagger.android.support.DaggerFragment
+import dagger.android.support.DaggerDialogFragment
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-abstract class BaseFragment<VM : BaseViewModel, VMAF : ViewModelAssistedFactory<VM>, VB : ViewBinding> :
-    DaggerFragment() {
+abstract class BaseDialogFragment<VM: BaseViewModel, VMAF: ViewModelAssistedFactory<VM>, VB: ViewBinding> : DaggerDialogFragment() {
     @Inject
     protected lateinit var viewModelAssistedFactory: VMAF
 
@@ -42,7 +42,7 @@ abstract class BaseFragment<VM : BaseViewModel, VMAF : ViewModelAssistedFactory<
     }
 
     protected open fun viewModelFactory(): (SavedStateHandle) -> ViewModel = { savedStateHandle ->
-        viewModelAssistedFactory.let { assistedFactory ->
+        viewModelAssistedFactory.let {  assistedFactory ->
             if (assistedFactory is BaseViewModelAssistedFactory<*>) {
                 assistedFactory.create(savedStateHandle)
             } else {
@@ -51,10 +51,5 @@ abstract class BaseFragment<VM : BaseViewModel, VMAF : ViewModelAssistedFactory<
                 )
             }
         }
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        viewBinding = null
     }
 }

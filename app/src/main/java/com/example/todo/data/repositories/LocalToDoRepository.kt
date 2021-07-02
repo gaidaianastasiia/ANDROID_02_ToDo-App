@@ -12,20 +12,24 @@ class LocalToDoRepository @Inject constructor(
 
     override suspend fun getById(id: Long) = toDoDao.getById(id).toToDo()
 
-    override suspend fun insert(text: String) {
+    override suspend fun insert(text: String): Boolean {
         val newTodo = ToDoData(text, false)
         toDoDao.insert(newTodo)
+        return true
     }
 
-    override suspend fun updateText(id: Long, updatedText: String) {
+    override suspend fun updateText(id: Long, updatedText: String): Boolean {
         toDoDao.updateText(id, updatedText)
+        return true
     }
 
-    override suspend fun updateDoneStatus(id: Long, updatedDoneStatus: Boolean) {
+    override suspend fun updateDoneStatus(id: Long, updatedDoneStatus: Boolean): Boolean {
         toDoDao.updateDoneStatus(id, updatedDoneStatus)
+        return true
     }
 
-    override suspend fun delete(id: Long) {
+    override suspend fun delete(id: Long): Boolean {
         toDoDao.delete(id)
+        return true
     }
 }

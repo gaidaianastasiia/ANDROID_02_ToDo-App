@@ -4,11 +4,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.setFragmentResultListener
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todo.databinding.FragmentToDoListBinding
 import com.example.todo.presentation.base.BaseFragment
 import kotlin.reflect.KClass
 
-private const val SHOPPING_LIST_CONTROLS_FRAGMENT_TAG = "ShoppingListsControlsFragment"
+private const val CREATE_TODO_FRAGMENT_DIALOG_TAG = "CREATE_TODO_FRAGMENT_DIALOG_TAG"
+private const val TO_DO_CONTROLS_FRAGMENT_TAG = "TO_DO_CONTROLS_FRAGMENT_TAG"
 
 class ToDoListFragment :
     BaseFragment<ToDoListViewModel, ToDoListViewModel.Factory, FragmentToDoListBinding>(),
@@ -17,19 +20,34 @@ class ToDoListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = viewBinding?.listRecyclerView
+        val recyclerView = binding.listRecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = ToDoAdapter(this)
-        recyclerView?.adapter = adapter
 
         viewModel.list.observe(viewLifecycleOwner) {
             adapter.submitList(it)
+        }
+
+        recyclerView.adapter = adapter
+
+
+        viewModel.showCreateToDoDialog.observe(viewLifecycleOwner) {
+            showCreateToDoDialog()
         }
 
         viewModel.controls.observe(viewLifecycleOwner) {
             showControlsListDialog(it)
         }
 
-        viewModel.onCreate()
+        setFragmentResultListener(TO_DO_DIALOG_RESULT_KEY) {_, _ ->
+            viewModel.fetchList()
+        }
+
+        viewModel.fetchList()
+
+        binding.addNewToDoFloatingActionButton.setOnClickListener {
+            viewModel.onAddNewToDoButtonClick()
+        }
     }
 
     override fun onToDoClick(id: Long, text: String) {
@@ -40,9 +58,14 @@ class ToDoListFragment :
         viewModel.onControlsListButtonClick(id)
     }
 
+    private fun showCreateToDoDialog() {
+        val createToDoDialog = ToDoDialogFragment()
+        createToDoDialog.show(parentFragmentManager, CREATE_TODO_FRAGMENT_DIALOG_TAG)
+    }
+
     private fun showControlsListDialog(id: Long) {
-        val controlsListDialog = ToDoControlsFragment.getInstance(id)
-        controlsListDialog.show(parentFragmentManager, SHOPPING_LIST_CONTROLS_FRAGMENT_TAG)
+        val controlsToDoDialog = ToDoControlsFragment.getInstance(id)
+        controlsToDoDialog.show(parentFragmentManager, TO_DO_CONTROLS_FRAGMENT_TAG)
     }
 
     override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class

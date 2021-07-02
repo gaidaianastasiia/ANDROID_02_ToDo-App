@@ -7,7 +7,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/editToDoTextButton"
-        style="@style/ListControls"
+        style="@style/ToDoControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_baseline_edit_24"
@@ -20,7 +20,7 @@
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/deleteToDoButton"
-        style="@style/ListControls"
+        style="@style/ToDoControls"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableStart="@drawable/ic_baseline_delete_24"

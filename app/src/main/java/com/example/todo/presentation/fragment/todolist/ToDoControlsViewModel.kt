@@ -12,7 +12,6 @@ import dagger.assisted.AssistedInject
 class ToDoControlsViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
     @Assisted id: Long,
-    private val updateToDoText: UpdateToDoTextInteractor,
     private val deleteToDo: DeleteToDoInteractor
 ): BaseViewModel(savedStateHandle) {
     @AssistedFactory

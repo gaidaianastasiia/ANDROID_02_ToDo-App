@@ -9,7 +9,6 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import com.example.todo.databinding.FragmentToDoControlsBinding
 import com.example.todo.presentation.base.BaseBottomSheetFragment
-import com.example.todo.presentation.fragment.example.ExampleFragment
 import kotlin.reflect.KClass
 
 private const val NO_LISTENER_EXCEPTION_MESSAGE = " must implement ToDoControlsFragmentListener"
@@ -17,7 +16,7 @@ private const val ID_ARGUMENT_KEY = "ID_ARGUMENT_KEY"
 
 class ToDoControlsFragment :
     BaseBottomSheetFragment<ToDoControlsViewModel, ToDoControlsViewModel.Factory, FragmentToDoControlsBinding>() {
-    lateinit var controlsFragmentListener: ToDoControlsFragmentListener
+    private lateinit var controlsFragmentListener: ToDoControlsFragmentListener
 
     interface ToDoControlsFragmentListener {
         fun onEditButtonClick(id: Long)
@@ -47,8 +46,8 @@ class ToDoControlsFragment :
     }
 
     private fun setEditButtonClickListener() {
-        viewBinding?.editToDoTextButton?.setOnClickListener {
-            val id = getListId()
+        binding.editToDoTextButton.setOnClickListener {
+            val id = getToDoId()
             id?.let {
                 controlsFragmentListener.onEditButtonClick(it)
             }
@@ -57,8 +56,8 @@ class ToDoControlsFragment :
     }
 
     private fun setDeleteButtonClickListener() {
-        viewBinding?.deleteToDoButton?.setOnClickListener {
-            val id = getListId()
+        binding.deleteToDoButton.setOnClickListener {
+            val id = getToDoId()
             id?.let {
                 controlsFragmentListener.onDeleteButtonClick(id)
             }
@@ -66,7 +65,7 @@ class ToDoControlsFragment :
         }
     }
 
-    private fun getListId() = arguments?.getLong(ID_ARGUMENT_KEY)
+    private fun getToDoId() = arguments?.getLong(ID_ARGUMENT_KEY)
 
     companion object {
         fun getInstance(id: Long) = ToDoControlsFragment().apply {
@@ -86,5 +85,5 @@ class ToDoControlsFragment :
     override fun createViewBinding(
         inflater: LayoutInflater,
         parent: ViewGroup?
-    ): FragmentToDoControlsBinding = FragmentToDoControlsBinding.inflate(inflater, parent, false)
+    ) = FragmentToDoControlsBinding.inflate(inflater, parent, false)
 }

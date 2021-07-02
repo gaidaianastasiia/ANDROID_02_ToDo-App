@@ -4,6 +4,7 @@ import com.example.todo.presentation.activity.MainViewModel
 import com.example.todo.presentation.base.ViewModelAssistedFactory
 import com.example.todo.presentation.fragment.example.ExampleViewModel
 import com.example.todo.presentation.fragment.todolist.ToDoControlsViewModel
+import com.example.todo.presentation.fragment.todolist.ToDoDialogViewModel
 import com.example.todo.presentation.fragment.todolist.ToDoListViewModel
 import dagger.Binds
 import dagger.Module
@@ -35,6 +36,11 @@ interface ViewModelFactoryModule {
     fun bindToDoControlsViewModelAssistedFactory(
         viewModelFactory: ToDoControlsViewModel.Factory
     ) : ViewModelAssistedFactory<ToDoControlsViewModel>
+
+    @Binds
+    fun bindToDoDialogViewModelAssistedFactory(
+        viewModelFactory: ToDoDialogViewModel.Factory
+    ) : ViewModelAssistedFactory<ToDoDialogViewModel>
 
     // >> Fragments
 }

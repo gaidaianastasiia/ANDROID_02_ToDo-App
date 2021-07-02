@@ -5,17 +5,16 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.todo.domain.GetAllToDosInteractor
-import com.example.todo.domain.GetToDoByIdInteractor
 import com.example.todo.entity.ToDo
 import com.example.todo.presentation.base.BaseViewModel
 import com.example.todo.presentation.base.BaseViewModelAssistedFactory
-import com.example.todo.presentation.base.ViewModelAssistedFactory
 import com.example.todo.presentation.utils.SingleLiveEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ToDoListViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
@@ -28,14 +27,26 @@ class ToDoListViewModel @AssistedInject constructor(
     val list: LiveData<List<ToDo>>
         get() = _list
 
+    private val _showCreateToDoDialog = SingleLiveEvent<Unit>()
+    val showCreateToDoDialog: LiveData<Unit>
+    get() = _showCreateToDoDialog
+
     private val _controls = MutableLiveData<Long>()
     val controls: LiveData<Long>
         get() = _controls
 
-    fun onCreate() {
+    fun fetchList() {
         viewModelScope.launch(Dispatchers.IO) {
-            _list.value = getAllToDos.invoke()
+            val toDoList = getAllToDos.invoke()
+
+            withContext(Dispatchers.Main) {
+                _list.value = toDoList
+            }
         }
+    }
+
+    fun onAddNewToDoButtonClick() {
+        _showCreateToDoDialog.call()
     }
 
     fun onControlsListButtonClick(id: Long) {

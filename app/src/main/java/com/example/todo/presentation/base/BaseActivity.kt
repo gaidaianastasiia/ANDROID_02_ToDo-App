@@ -11,16 +11,18 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 abstract class BaseActivity<
-        VM: BaseViewModel,
-        VMAF: ViewModelAssistedFactory<VM>,
-        VB: ViewBinding
->: DaggerAppCompatActivity() {
+        VM : BaseViewModel,
+        VMAF : ViewModelAssistedFactory<VM>,
+        VB : ViewBinding
+        > : DaggerAppCompatActivity() {
     @Inject
     protected lateinit var viewModelAssistedFactory: VMAF
 
     protected abstract val viewModelClass: KClass<VM>
 
     private var viewBinding: VB? = null
+    val binding: VB
+        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,7 +41,7 @@ abstract class BaseActivity<
     }
 
     protected open fun viewModelFactory(): (SavedStateHandle) -> ViewModel = { savedStateHandle ->
-        viewModelAssistedFactory.let {  assistedFactory ->
+        viewModelAssistedFactory.let { assistedFactory ->
             if (assistedFactory is BaseViewModelAssistedFactory<*>) {
                 assistedFactory.create(savedStateHandle)
             } else {

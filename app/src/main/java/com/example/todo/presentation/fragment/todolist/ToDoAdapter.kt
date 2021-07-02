@@ -27,6 +27,15 @@ class ToDoAdapter(
         fun onToDoLongClick(id: Long)
     }
 
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val itemBinding = ToDoListItemLayoutBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
+        )
+        return ViewHolder(itemBinding)
+    }
+
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val id = getItem(position).id
         val text = getItem(position).text
@@ -40,15 +49,6 @@ class ToDoAdapter(
             toDoAdapterListener.onToDoLongClick(id)
             true
         }
-    }
-
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val itemBinding = ToDoListItemLayoutBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
-        return ViewHolder(itemBinding)
     }
 
     class ViewHolder(
