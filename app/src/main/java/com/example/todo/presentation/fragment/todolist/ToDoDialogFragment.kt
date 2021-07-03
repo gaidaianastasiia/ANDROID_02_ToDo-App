@@ -1,7 +1,5 @@
 package com.example.todo.presentation.fragment.todolist
 
-import android.app.AlertDialog
-import android.app.Dialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -106,10 +104,10 @@ class ToDoDialogFragment :
 
     companion object {
         fun getInstance(id: Long, text: String) = ToDoDialogFragment().apply {
-            arguments?.run {
-                putLong(ID_ARGUMENT_KEY, id)
-                putString(TEXT_ARGUMENT_KEY, text)
-            }
+            arguments = bundleOf(
+                Pair(ID_ARGUMENT_KEY, id),
+                Pair(TEXT_ARGUMENT_KEY, text)
+            )
         }
     }
 

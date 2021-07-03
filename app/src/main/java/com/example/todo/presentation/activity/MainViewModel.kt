@@ -1,6 +1,5 @@
 package com.example.todo.presentation.activity
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.SavedStateHandle
 import com.example.todo.presentation.base.BaseViewModel

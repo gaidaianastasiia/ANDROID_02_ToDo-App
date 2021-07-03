@@ -23,8 +23,8 @@ class ToDoAdapter(
     private val toDoAdapterListener: ToDoAdapterListener
 ) : ListAdapter<ToDo, ToDoAdapter.ViewHolder>(DIFF_CALLBACK) {
     interface ToDoAdapterListener {
-        fun onToDoClick(id: Long, text: String)
-        fun onToDoLongClick(id: Long)
+        fun onToDoClick(id: Long)
+        fun onToDoLongClick(id: Long, text: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -42,11 +42,11 @@ class ToDoAdapter(
         holder.bind(text)
 
         holder.view.setOnClickListener {
-            toDoAdapterListener.onToDoClick(id, text)
+            toDoAdapterListener.onToDoClick(id)
         }
 
         holder.view.setOnLongClickListener {
-            toDoAdapterListener.onToDoLongClick(id)
+            toDoAdapterListener.onToDoLongClick(id, text)
             true
         }
     }

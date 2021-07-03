@@ -30,13 +30,12 @@ class ToDoListFragment :
 
         recyclerView.adapter = adapter
 
-
         viewModel.showCreateToDoDialog.observe(viewLifecycleOwner) {
             showCreateToDoDialog()
         }
 
         viewModel.controls.observe(viewLifecycleOwner) {
-            showControlsListDialog(it)
+            showControlsListDialog(it.id, it.text)
         }
 
         setFragmentResultListener(TO_DO_DIALOG_RESULT_KEY) {_, _ ->
@@ -50,11 +49,11 @@ class ToDoListFragment :
         }
     }
 
-    override fun onToDoClick(id: Long, text: String) {
+    override fun onToDoClick(id: Long) {
         TODO("Not yet implemented")
     }
 
-    override fun onToDoLongClick(id: Long) {
+    override fun onToDoLongClick(id: Long, text: String) {
         viewModel.onControlsListButtonClick(id)
     }
 
@@ -63,8 +62,8 @@ class ToDoListFragment :
         createToDoDialog.show(parentFragmentManager, CREATE_TODO_FRAGMENT_DIALOG_TAG)
     }
 
-    private fun showControlsListDialog(id: Long) {
-        val controlsToDoDialog = ToDoControlsFragment.getInstance(id)
+    private fun showControlsListDialog(id: Long, text: String) {
+        val controlsToDoDialog = ToDoControlsFragment.getInstance(id, text)
         controlsToDoDialog.show(parentFragmentManager, TO_DO_CONTROLS_FRAGMENT_TAG)
     }
 

@@ -17,7 +17,7 @@ class DaggerDialogFragment: DialogFragment(), HasAndroidInjector {
         super.onAttach(context)
     }
 
-    override fun androidInjector(): AndroidInjector<Any?>? {
+    override fun androidInjector(): AndroidInjector<Any?> {
         return androidInjector
     }
 }

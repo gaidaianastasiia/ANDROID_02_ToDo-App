@@ -1,16 +1,13 @@
 package com.example.todo.presentation.fragment.todolist
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.example.todo.domain.InsertToDoInteractor
 import com.example.todo.domain.UpdateToDoTextInteractor
-import com.example.todo.presentation.activity.MainViewModel
 import com.example.todo.presentation.base.BaseViewModel
 import com.example.todo.presentation.base.BaseViewModelAssistedFactory
-import com.example.todo.presentation.base.ViewModelAssistedFactory
 import com.example.todo.presentation.utils.SingleLiveEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -35,7 +32,7 @@ class ToDoDialogViewModel @AssistedInject constructor(
 
     private val _storagePositiveResponse = SingleLiveEvent<Unit>()
     val storagePositiveResponse: LiveData<Unit>
-    get() = _storagePositiveResponse
+        get() = _storagePositiveResponse
 
     init {
         savedStateHandle.get<String>(TEXT_STATE_KEY)?.let {
@@ -52,7 +49,7 @@ class ToDoDialogViewModel @AssistedInject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             val storageResponse = create(text)
 
-            if(storageResponse) {
+            if (storageResponse) {
                 withContext(Dispatchers.Main) {
                     _storagePositiveResponse.call()
                 }
@@ -61,14 +58,14 @@ class ToDoDialogViewModel @AssistedInject constructor(
     }
 
     fun editToDo(id: Long, text: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val storageResponse = edit(id, text)
-//
-//            if(storageResponse) {
-//                withContext(Dispatchers.Main) {
-//                    _storagePositiveResponse.call()
-//                }
-//            }
-//        }
+        viewModelScope.launch(Dispatchers.IO) {
+            val storageResponse = edit(id, text)
+
+            if (storageResponse) {
+                withContext(Dispatchers.Main) {
+                    _storagePositiveResponse.call()
+                }
+            }
+        }
     }
 }

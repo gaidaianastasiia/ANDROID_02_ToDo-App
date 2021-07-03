@@ -14,14 +14,14 @@ interface ToDoDao {
     suspend fun getById(id: Long): ToDoData
 
     @Insert
-    suspend fun insert(ToDoData: ToDoData): Long
+    suspend fun insert(ToDoData: ToDoData)
 
     @Query("UPDATE ToDoData SET text = :updatedText WHERE id = :id")
-    suspend fun updateText(id: Long, updatedText: String): Int
+    suspend fun updateText(id: Long, updatedText: String)
 
     @Query("UPDATE ToDoData SET doneStatus = :updatedDoneStatus WHERE id = :id")
-    suspend fun updateDoneStatus(id: Long, updatedDoneStatus: Boolean): Int
+    suspend fun updateDoneStatus(id: Long, updatedDoneStatus: Boolean)
 
     @Query("DELETE FROM ToDoData WHERE id = :idToDelete")
-    suspend fun delete(idToDelete: Long): Int
+    suspend fun delete(idToDelete: Long)
 }
