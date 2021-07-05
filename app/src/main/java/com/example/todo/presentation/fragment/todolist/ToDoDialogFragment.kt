@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 
 private const val ID_ARGUMENT_KEY = "ID_ARGUMENT_KEY"
 private const val TEXT_ARGUMENT_KEY = "TEXT_ARGUMENT_KEY"
-const val TO_DO_DIALOG_RESULT_KEY = "TO_DO_DIALOG_RESULT_KEY"
+const val EDIT_TO_DO_DIALOG_RESULT_KEY = "EDIT_TO_DO_DIALOG_RESULT_KEY"
 
 class ToDoDialogFragment :
     BaseDialogFragment<ToDoDialogViewModel, ToDoDialogViewModel.Factory, FragmentToDoDialogBinding>() {
@@ -50,7 +50,7 @@ class ToDoDialogFragment :
         }
 
         viewModel.storagePositiveResponse.observe(viewLifecycleOwner) {
-            setFragmentResult(TO_DO_DIALOG_RESULT_KEY, bundleOf())
+            setFragmentResult(EDIT_TO_DO_DIALOG_RESULT_KEY, bundleOf())
         }
     }
 

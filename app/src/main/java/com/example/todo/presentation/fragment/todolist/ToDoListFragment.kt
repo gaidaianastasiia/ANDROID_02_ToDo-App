@@ -6,12 +6,16 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.setFragmentResultListener
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.example.todo.R
 import com.example.todo.databinding.FragmentToDoListBinding
 import com.example.todo.presentation.base.BaseFragment
+import com.google.android.material.snackbar.BaseTransientBottomBar
+import com.google.android.material.snackbar.Snackbar
 import kotlin.reflect.KClass
 
 private const val CREATE_TODO_FRAGMENT_DIALOG_TAG = "CREATE_TODO_FRAGMENT_DIALOG_TAG"
 private const val TO_DO_CONTROLS_FRAGMENT_TAG = "TO_DO_CONTROLS_FRAGMENT_TAG"
+private const val RECOVER_DELETE_TO_DO_MESSAGE = "To-Do has been removed"
 
 class ToDoListFragment :
     BaseFragment<ToDoListViewModel, ToDoListViewModel.Factory, FragmentToDoListBinding>(),
@@ -23,12 +27,11 @@ class ToDoListFragment :
         val recyclerView = binding.listRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         val adapter = ToDoAdapter(this)
+        recyclerView.adapter = adapter
 
         viewModel.list.observe(viewLifecycleOwner) {
             adapter.submitList(it)
         }
-
-        recyclerView.adapter = adapter
 
         viewModel.showCreateToDoDialog.observe(viewLifecycleOwner) {
             showCreateToDoDialog()
@@ -38,8 +41,17 @@ class ToDoListFragment :
             showControlsListDialog(it.id, it.text)
         }
 
-        setFragmentResultListener(TO_DO_DIALOG_RESULT_KEY) {_, _ ->
+        viewModel.showRecoverDeletedTodoMessage.observe((viewLifecycleOwner)) {
+            showRecoverDeletedTodoMessage(it)
+        }
+
+        setFragmentResultListener(EDIT_TO_DO_DIALOG_RESULT_KEY) { _, _ ->
             viewModel.fetchList()
+        }
+
+        setFragmentResultListener((DELETE_TO_DO_REQUEST_KEY)) { _, bundle ->
+            val id = bundle.getLong(DELETED_TO_DO_ID)
+            viewModel.onDeleteRequest(id)
         }
 
         viewModel.fetchList()
@@ -65,6 +77,20 @@ class ToDoListFragment :
     private fun showControlsListDialog(id: Long, text: String) {
         val controlsToDoDialog = ToDoControlsFragment.getInstance(id, text)
         controlsToDoDialog.show(parentFragmentManager, TO_DO_CONTROLS_FRAGMENT_TAG)
+    }
+
+    private fun showRecoverDeletedTodoMessage(id: Long) {
+        Snackbar.make(binding.root, RECOVER_DELETE_TO_DO_MESSAGE, Snackbar.LENGTH_LONG)
+            .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
+                override fun onDismissed(transientBottomBar: Snackbar?, event: Int) {
+                    super.onDismissed(transientBottomBar, event)
+                    if (event == DISMISS_EVENT_TIMEOUT) {
+                        viewModel.delete(id)
+                    }
+                }
+            })
+            .setAction(R.string.recover_button) { viewModel.fetchList() }
+            .show()
     }
 
     override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class

@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.todo.domain.DeleteToDoInteractor
 import com.example.todo.domain.GetAllToDosInteractor
 import com.example.todo.domain.GetToDoByIdInteractor
 import com.example.todo.entity.ToDo
@@ -21,6 +22,7 @@ class ToDoListViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
     private val getAllToDos: GetAllToDosInteractor,
     private val getToDoById: GetToDoByIdInteractor,
+    private val deleteToDo: DeleteToDoInteractor
 ) : BaseViewModel(savedStateHandle) {
     @AssistedFactory
     interface Factory : BaseViewModelAssistedFactory<ToDoListViewModel>
@@ -36,6 +38,10 @@ class ToDoListViewModel @AssistedInject constructor(
     private val _controls = MutableLiveData<ToDo>()
     val controls: LiveData<ToDo>
         get() = _controls
+
+    private val _showRecoverDeletedTodoMessage = MutableLiveData<Long>()
+    val showRecoverDeletedTodoMessage: LiveData<Long>
+        get() = _showRecoverDeletedTodoMessage
 
     fun fetchList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -56,9 +62,25 @@ class ToDoListViewModel @AssistedInject constructor(
 
             withContext(Dispatchers.Main) {
                 _controls.value = toDo
+                _showRecoverDeletedTodoMessage.value = id
             }
         }
+    }
 
+    fun onDeleteRequest(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val toDoList = getAllToDos.invoke().toMutableList()
+            toDoList.removeAll { it.id == id }
 
+            withContext(Dispatchers.Main) {
+                _list.value = toDoList
+            }
+        }
+    }
+
+    fun delete(id: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            deleteToDo(id)
+        }
     }
 }
