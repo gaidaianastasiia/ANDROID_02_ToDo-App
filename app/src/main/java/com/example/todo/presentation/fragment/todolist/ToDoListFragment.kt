@@ -61,12 +61,13 @@ class ToDoListFragment :
         }
     }
 
-    override fun onToDoClick(id: Long) {
-        TODO("Not yet implemented")
+    override fun onToDoClick(id: Long, doneStatus: Boolean) {
+        viewModel.onClick(id, doneStatus)
     }
 
+
     override fun onToDoLongClick(id: Long, text: String) {
-        viewModel.onControlsListButtonClick(id)
+        viewModel.onLongClick(id)
     }
 
     private fun showCreateToDoDialog() {

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.example.todo.R
 import com.example.todo.databinding.ToDoListItemLayoutBinding
 import com.example.todo.entity.ToDo
 
@@ -23,7 +24,7 @@ class ToDoAdapter(
     private val toDoAdapterListener: ToDoAdapterListener
 ) : ListAdapter<ToDo, ToDoAdapter.ViewHolder>(DIFF_CALLBACK) {
     interface ToDoAdapterListener {
-        fun onToDoClick(id: Long)
+        fun onToDoClick(id: Long, doneStatus: Boolean)
         fun onToDoLongClick(id: Long, text: String)
     }
 
@@ -39,10 +40,11 @@ class ToDoAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val id = getItem(position).id
         val text = getItem(position).text
-        holder.bind(text)
+        val doneStatus = getItem(position).doneStatus
+        holder.bind(text, doneStatus)
 
         holder.view.setOnClickListener {
-            toDoAdapterListener.onToDoClick(id)
+            toDoAdapterListener.onToDoClick(id, doneStatus)
         }
 
         holder.view.setOnLongClickListener {
@@ -56,8 +58,17 @@ class ToDoAdapter(
     ) : RecyclerView.ViewHolder(itemBinding.root) {
         lateinit var view: View
 
-        fun bind(toDoText: String) {
+        fun bind(toDoText: String, doneStatus: Boolean) {
             itemBinding.itemTextTextView.text = toDoText
+
+            if(doneStatus) {
+                itemBinding.itemTextTextView.setCheckMarkDrawable(R.drawable.ic_baseline_check_box_24)
+            } else {
+                itemBinding.itemTextTextView.setCheckMarkDrawable(R.drawable.ic_baseline_check_box_outline_blank_24)
+            }
+
+            itemBinding.itemTextTextView.isChecked = doneStatus
+
             view = itemBinding.root
         }
     }

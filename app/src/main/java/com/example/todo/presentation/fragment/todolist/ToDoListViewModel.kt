@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.todo.domain.DeleteToDoInteractor
 import com.example.todo.domain.GetAllToDosInteractor
 import com.example.todo.domain.GetToDoByIdInteractor
+import com.example.todo.domain.UpdateToDoDoneStatusInteractor
 import com.example.todo.entity.ToDo
 import com.example.todo.presentation.base.BaseViewModel
 import com.example.todo.presentation.base.BaseViewModelAssistedFactory
@@ -22,6 +23,7 @@ class ToDoListViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
     private val getAllToDos: GetAllToDosInteractor,
     private val getToDoById: GetToDoByIdInteractor,
+    private val updateDoneStatus: UpdateToDoDoneStatusInteractor,
     private val deleteToDo: DeleteToDoInteractor
 ) : BaseViewModel(savedStateHandle) {
     @AssistedFactory
@@ -56,13 +58,23 @@ class ToDoListViewModel @AssistedInject constructor(
         _showCreateToDoDialog.call()
     }
 
-    fun onControlsListButtonClick(id: Long) {
+    fun onClick(id: Long, doneStatus: Boolean) {
+        viewModelScope.launch(Dispatchers.IO) {
+            updateDoneStatus(id, !doneStatus)
+            val toDoList = getAllToDos.invoke()
+
+            withContext(Dispatchers.Main) {
+                _list.value = toDoList
+            }
+        }
+    }
+
+    fun onLongClick(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             val toDo = getToDoById(id)
 
             withContext(Dispatchers.Main) {
                 _controls.value = toDo
-                _showRecoverDeletedTodoMessage.value = id
             }
         }
     }
@@ -74,6 +86,7 @@ class ToDoListViewModel @AssistedInject constructor(
 
             withContext(Dispatchers.Main) {
                 _list.value = toDoList
+                _showRecoverDeletedTodoMessage.value = id
             }
         }
     }
