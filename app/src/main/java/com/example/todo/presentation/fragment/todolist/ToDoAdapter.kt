@@ -1,12 +1,10 @@
 package com.example.todo.presentation.fragment.todolist
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import com.example.todo.R
 import com.example.todo.databinding.ToDoListItemLayoutBinding
 import com.example.todo.entity.ToDo
 
@@ -41,35 +39,30 @@ class ToDoAdapter(
         val id = getItem(position).id
         val text = getItem(position).text
         val doneStatus = getItem(position).doneStatus
+
         holder.bind(text, doneStatus)
 
-        holder.view.setOnClickListener {
+        holder.itemBinding.root.setOnClickListener {
             toDoAdapterListener.onToDoClick(id, doneStatus)
         }
 
-        holder.view.setOnLongClickListener {
+        holder.itemBinding.root.setOnLongClickListener {
             toDoAdapterListener.onToDoLongClick(id, text)
             true
+        }
+
+        holder.itemBinding.itemDoneStatusCheckBox.setOnClickListener {
+            toDoAdapterListener.onToDoClick(id, doneStatus)
         }
     }
 
     class ViewHolder(
-        private val itemBinding: ToDoListItemLayoutBinding
+        val itemBinding: ToDoListItemLayoutBinding
     ) : RecyclerView.ViewHolder(itemBinding.root) {
-        lateinit var view: View
 
         fun bind(toDoText: String, doneStatus: Boolean) {
             itemBinding.itemTextTextView.text = toDoText
-
-            if(doneStatus) {
-                itemBinding.itemTextTextView.setCheckMarkDrawable(R.drawable.ic_baseline_check_box_24)
-            } else {
-                itemBinding.itemTextTextView.setCheckMarkDrawable(R.drawable.ic_baseline_check_box_outline_blank_24)
-            }
-
-            itemBinding.itemTextTextView.isChecked = doneStatus
-
-            view = itemBinding.root
+            itemBinding.itemDoneStatusCheckBox.isChecked = doneStatus
         }
     }
 }

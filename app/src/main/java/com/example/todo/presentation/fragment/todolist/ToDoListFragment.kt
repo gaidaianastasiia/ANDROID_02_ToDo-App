@@ -24,26 +24,8 @@ class ToDoListFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val recyclerView = binding.listRecyclerView
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
-        val adapter = ToDoAdapter(this)
-        recyclerView.adapter = adapter
-
-        viewModel.list.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
-
-        viewModel.showCreateToDoDialog.observe(viewLifecycleOwner) {
-            showCreateToDoDialog()
-        }
-
-        viewModel.controls.observe(viewLifecycleOwner) {
-            showControlsListDialog(it.id, it.text)
-        }
-
-        viewModel.showRecoverDeletedTodoMessage.observe((viewLifecycleOwner)) {
-            showRecoverDeletedTodoMessage(it)
-        }
+        setAdapter()
+        setObserve()
 
         setFragmentResultListener(EDIT_TO_DO_DIALOG_RESULT_KEY) { _, _ ->
             viewModel.fetchList()
@@ -70,6 +52,48 @@ class ToDoListFragment :
         viewModel.onLongClick(id)
     }
 
+    private fun setAdapter() {
+        val recyclerView = binding.listRecyclerView
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        val adapter = ToDoAdapter(this)
+        recyclerView.adapter = adapter
+
+        viewModel.list.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+    }
+
+    private fun setObserve() {
+        viewModel.showCreateToDoDialog.observe(viewLifecycleOwner) {
+            showCreateToDoDialog()
+        }
+
+        viewModel.controls.observe(viewLifecycleOwner) {
+            showControlsListDialog(it.id, it.text)
+        }
+
+        viewModel.showRecoverDeletedTodoMessage.observe(viewLifecycleOwner) {
+            showRecoverDeletedTodoMessage(it)
+        }
+
+        viewModel.showEmptyState.observe(viewLifecycleOwner) {
+            showEmptyState()
+        }
+
+        viewModel.hideEmptyState.observe(viewLifecycleOwner) {
+            hideEmptyState()
+        }
+
+        viewModel.showLoader.observe(viewLifecycleOwner) {
+            showLoader()
+        }
+
+        viewModel.hideLoader.observe(viewLifecycleOwner) {
+            hideLoader()
+        }
+    }
+
     private fun showCreateToDoDialog() {
         val createToDoDialog = ToDoDialogFragment()
         createToDoDialog.show(parentFragmentManager, CREATE_TODO_FRAGMENT_DIALOG_TAG)
@@ -92,6 +116,22 @@ class ToDoListFragment :
             })
             .setAction(R.string.recover_button) { viewModel.fetchList() }
             .show()
+    }
+
+    private fun showEmptyState() {
+        binding.emptyStateTextView.visibility = View.VISIBLE
+    }
+
+    private fun hideEmptyState() {
+        binding.emptyStateTextView.visibility = View.GONE
+    }
+
+    private fun showLoader() {
+        binding.progressBar.visibility = View.VISIBLE
+    }
+
+    private fun hideLoader() {
+        binding.progressBar.visibility = View.GONE
     }
 
     override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class

@@ -29,6 +29,22 @@ class ToDoListViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory : BaseViewModelAssistedFactory<ToDoListViewModel>
 
+    private val _showEmptyState = SingleLiveEvent<Unit>()
+    val showEmptyState: LiveData<Unit>
+        get() = _showEmptyState
+
+    private val _hideEmptyState = SingleLiveEvent<Unit>()
+    val hideEmptyState: LiveData<Unit>
+        get() = _hideEmptyState
+
+    private val _showLoader = SingleLiveEvent<Unit>()
+    val showLoader: LiveData<Unit>
+        get() = _showLoader
+
+    private val _hideLoader = SingleLiveEvent<Unit>()
+    val hideLoader: LiveData<Unit>
+        get() = _hideLoader
+
     private val _list = MutableLiveData<List<ToDo>>()
     val list: LiveData<List<ToDo>>
         get() = _list
@@ -47,10 +63,7 @@ class ToDoListViewModel @AssistedInject constructor(
 
     fun fetchList() {
         viewModelScope.launch(Dispatchers.IO) {
-            val toDoList = getAllToDos.invoke()
-            withContext(Dispatchers.Main) {
-                _list.value = toDoList
-            }
+            getList()
         }
     }
 
@@ -61,11 +74,7 @@ class ToDoListViewModel @AssistedInject constructor(
     fun onClick(id: Long, doneStatus: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             updateDoneStatus(id, !doneStatus)
-            val toDoList = getAllToDos.invoke()
-
-            withContext(Dispatchers.Main) {
-                _list.value = toDoList
-            }
+            getList()
         }
     }
 
@@ -80,12 +89,14 @@ class ToDoListViewModel @AssistedInject constructor(
     }
 
     fun onDeleteRequest(id: Long) {
+        _showLoader.call()
+
         viewModelScope.launch(Dispatchers.IO) {
             val toDoList = getAllToDos.invoke().toMutableList()
             toDoList.removeAll { it.id == id }
+            updateList(toDoList)
 
             withContext(Dispatchers.Main) {
-                _list.value = toDoList
                 _showRecoverDeletedTodoMessage.value = id
             }
         }
@@ -94,6 +105,28 @@ class ToDoListViewModel @AssistedInject constructor(
     fun delete(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
             deleteToDo(id)
+        }
+    }
+
+    private suspend fun getList() {
+        viewModelScope.launch(Dispatchers.Main) {
+            _showLoader.call()
+        }
+
+        val toDoList = getAllToDos.invoke()
+        updateList(toDoList)
+    }
+
+    private fun updateList(list: List<ToDo>) {
+        viewModelScope.launch(Dispatchers.Main) {
+            if (list.isEmpty()) {
+                _showEmptyState.call()
+            } else {
+                _hideEmptyState.call()
+            }
+
+            _hideLoader.call()
+            _list.value = list
         }
     }
 }
