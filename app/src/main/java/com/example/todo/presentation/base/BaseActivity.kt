@@ -1,7 +1,6 @@
 package com.example.todo.presentation.base
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.LayoutInflater
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -12,19 +11,21 @@ import javax.inject.Inject
 import kotlin.reflect.KClass
 
 abstract class BaseActivity<
-        VM: BaseViewModel,
-        VMAF: ViewModelAssistedFactory<VM>,
-        VB: ViewBinding
->: DaggerAppCompatActivity() {
+        VM : BaseViewModel,
+        VMAF : ViewModelAssistedFactory<VM>,
+        VB : ViewBinding
+        > : DaggerAppCompatActivity() {
     @Inject
     protected lateinit var viewModelAssistedFactory: VMAF
 
     protected abstract val viewModelClass: KClass<VM>
 
     private var viewBinding: VB? = null
+    val binding: VB
+        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
 
-    override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-        super.onCreate(savedInstanceState, persistentState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         viewBinding = createViewBinding(LayoutInflater.from(this)).also {
             setContentView(it.root)
         }
@@ -40,7 +41,7 @@ abstract class BaseActivity<
     }
 
     protected open fun viewModelFactory(): (SavedStateHandle) -> ViewModel = { savedStateHandle ->
-        viewModelAssistedFactory.let {  assistedFactory ->
+        viewModelAssistedFactory.let { assistedFactory ->
             if (assistedFactory is BaseViewModelAssistedFactory<*>) {
                 assistedFactory.create(savedStateHandle)
             } else {
