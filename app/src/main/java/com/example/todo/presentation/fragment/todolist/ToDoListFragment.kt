@@ -28,7 +28,7 @@ class ToDoListFragment :
         setObserve()
 
         setFragmentResultListener(EDIT_TO_DO_DIALOG_RESULT_KEY) { _, _ ->
-            viewModel.fetchList()
+            viewModel.requestList()
         }
 
         setFragmentResultListener((DELETE_TO_DO_REQUEST_KEY)) { _, bundle ->
@@ -36,7 +36,7 @@ class ToDoListFragment :
             viewModel.onDeleteRequest(id)
         }
 
-        viewModel.fetchList()
+        viewModel.requestList()
 
         binding.addNewToDoFloatingActionButton.setOnClickListener {
             viewModel.onAddNewToDoButtonClick()
@@ -114,7 +114,7 @@ class ToDoListFragment :
                     }
                 }
             })
-            .setAction(R.string.recover_button) { viewModel.fetchList() }
+            .setAction(R.string.recover_button) { viewModel.requestList() }
             .show()
     }
 

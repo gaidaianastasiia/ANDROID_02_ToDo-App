@@ -61,7 +61,7 @@ class ToDoListViewModel @AssistedInject constructor(
     val showRecoverDeletedTodoMessage: LiveData<Long>
         get() = _showRecoverDeletedTodoMessage
 
-    fun fetchList() {
+    fun requestList() {
         viewModelScope.launch(Dispatchers.IO) {
             getList()
         }

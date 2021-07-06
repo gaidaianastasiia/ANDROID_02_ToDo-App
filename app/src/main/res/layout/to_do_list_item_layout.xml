@@ -15,7 +15,7 @@
         app:layout_constraintEnd_toStartOf="@+id/itemDoneStatusCheckBox"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="todo long text todo long text todo long text todo long text todo long text todo long text" />
+        tools:text="todo long" />
 
     <androidx.appcompat.widget.AppCompatCheckBox
         android:id="@+id/itemDoneStatusCheckBox"
@@ -23,7 +23,6 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="10dp"
         android:layout_marginLeft="5dp"
-        android:gravity="top"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/itemTextTextView"
         app:layout_constraintTop_toTopOf="parent" />
