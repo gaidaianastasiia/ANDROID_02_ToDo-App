@@ -4,10 +4,12 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.viewbinding.ViewBinding
+import com.example.todo.R
 import dagger.android.support.DaggerDialogFragment
 import javax.inject.Inject
 import kotlin.reflect.KClass
@@ -27,6 +29,11 @@ abstract class BaseDialogFragment<VM: BaseViewModel, VMAF: ViewModelAssistedFact
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? = createViewBinding(inflater, container).also { viewBinding = it }.root
+
+    protected fun showErrorMessage() {
+        val message = getString(R.string.error_message)
+        Toast.makeText(requireContext(), message, Toast.LENGTH_LONG).show()
+    }
 
     protected abstract fun createViewBinding(
         inflater: LayoutInflater,

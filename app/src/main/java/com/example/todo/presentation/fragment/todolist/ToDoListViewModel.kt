@@ -1,5 +1,6 @@
 package com.example.todo.presentation.fragment.todolist
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -45,6 +46,10 @@ class ToDoListViewModel @AssistedInject constructor(
     val hideLoader: LiveData<Unit>
         get() = _hideLoader
 
+    private val _showErrorMessage = SingleLiveEvent<Unit>()
+    val showErrorMessage: LiveData<Unit>
+        get() = _showErrorMessage
+
     private val _list = MutableLiveData<List<ToDo>>()
     val list: LiveData<List<ToDo>>
         get() = _list
@@ -63,7 +68,7 @@ class ToDoListViewModel @AssistedInject constructor(
 
     fun requestList() {
         viewModelScope.launch(Dispatchers.IO) {
-            getList()
+            fetchList()
         }
     }
 
@@ -74,17 +79,20 @@ class ToDoListViewModel @AssistedInject constructor(
     fun onClick(id: Long, doneStatus: Boolean) {
         viewModelScope.launch(Dispatchers.IO) {
             updateDoneStatus(id, !doneStatus)
-            getList()
+                .doOnError { error -> onStorageError(error) }
+            fetchList()
         }
     }
 
     fun onLongClick(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            val toDo = getToDoById(id)
-
-            withContext(Dispatchers.Main) {
-                _controls.value = toDo
-            }
+            getToDoById(id)
+                .doOnSuccess { toDo ->
+                    withContext(Dispatchers.Main) {
+                        _controls.value = toDo
+                    }
+                }
+                .doOnError { error -> onStorageError(error) }
         }
     }
 
@@ -92,9 +100,13 @@ class ToDoListViewModel @AssistedInject constructor(
         _showLoader.call()
 
         viewModelScope.launch(Dispatchers.IO) {
-            val toDoList = getAllToDos.invoke().toMutableList()
-            toDoList.removeAll { it.id == id }
-            updateList(toDoList)
+            getAllToDos.invoke()
+                .doOnSuccess { list ->
+                    val updatedList = list.toMutableList()
+                    updatedList.removeIf { it.id == id }
+                    updateList(updatedList)
+                }
+                .doOnError { error -> onStorageError(error) }
 
             withContext(Dispatchers.Main) {
                 _showRecoverDeletedTodoMessage.value = id
@@ -104,17 +116,20 @@ class ToDoListViewModel @AssistedInject constructor(
 
     fun delete(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
-            deleteToDo(id)
+            deleteToDo(id).doOnError { error -> onStorageError(error) }
         }
     }
 
-    private suspend fun getList() {
+    private suspend fun fetchList() {
         viewModelScope.launch(Dispatchers.Main) {
             _showLoader.call()
         }
 
-        val toDoList = getAllToDos.invoke()
-        updateList(toDoList)
+        getAllToDos.invoke()
+            .doOnSuccess { list ->
+                updateList(list)
+            }
+            .doOnError { error -> onStorageError(error) }
     }
 
     private fun updateList(list: List<ToDo>) {
@@ -127,6 +142,13 @@ class ToDoListViewModel @AssistedInject constructor(
 
             _hideLoader.call()
             _list.value = list
+        }
+    }
+
+    private fun onStorageError(error: Throwable) {
+        viewModelScope.launch(Dispatchers.Main) {
+            _showErrorMessage.call()
+            Log.e(this::class.simpleName, error.toString())
         }
     }
 }
