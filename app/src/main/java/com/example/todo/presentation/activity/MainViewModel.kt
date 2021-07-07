@@ -15,8 +15,6 @@ class MainViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory : BaseViewModelAssistedFactory<MainViewModel>
 
-    //отличие SingleLiveEvent от LiveData в том что в момент подписки не вызывается метод observe
-    //используется в тех случаях когда данные не меняются а происходит событие
     private val _startEvent = SingleLiveEvent<Unit>()
     val startEvent: LiveData<Unit>
         get() = _startEvent

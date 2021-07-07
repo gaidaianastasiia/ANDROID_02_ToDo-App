@@ -7,9 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import java.util.concurrent.atomic.AtomicBoolean
 
-//отличие SingleLiveEvent от LiveData в том что в момент подписки не вызывается метод observe
-//используется в тех случаях когда данные не меняются а происходит событие
-
 private const val TAG = "SingleLiveEvent"
 
 class SingleLiveEvent<T> : MutableLiveData<T>() {
