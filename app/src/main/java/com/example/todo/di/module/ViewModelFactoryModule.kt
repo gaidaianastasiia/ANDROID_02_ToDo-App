@@ -2,7 +2,6 @@ package com.example.todo.di.module
 
 import com.example.todo.presentation.activity.MainViewModel
 import com.example.todo.presentation.base.ViewModelAssistedFactory
-import com.example.todo.presentation.fragment.example.ExampleViewModel
 import com.example.todo.presentation.fragment.todolist.ToDoControlsViewModel
 import com.example.todo.presentation.fragment.todolist.ToDoDialogViewModel
 import com.example.todo.presentation.fragment.todolist.ToDoListViewModel
@@ -21,11 +20,6 @@ interface ViewModelFactoryModule {
     // >> Activities
 
     // >> Fragments
-
-    @Binds
-    fun bindExampleViewModelAssistedFactory(
-        viewModelFactory: ExampleViewModel.Factory
-    ): ViewModelAssistedFactory<ExampleViewModel>
 
     @Binds
     fun bindToDoListViewModelAssistedFactory(

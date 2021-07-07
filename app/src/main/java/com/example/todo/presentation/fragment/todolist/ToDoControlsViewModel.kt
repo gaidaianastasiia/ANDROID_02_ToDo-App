@@ -11,24 +11,24 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 
 class ToDoControlsViewModel @AssistedInject constructor(
-  @Assisted savedStateHandle: SavedStateHandle,
+    @Assisted savedStateHandle: SavedStateHandle,
 ) : BaseViewModel(savedStateHandle) {
-  @AssistedFactory
-  interface Factory : BaseViewModelAssistedFactory<ToDoControlsViewModel>
+    @AssistedFactory
+    interface Factory : BaseViewModelAssistedFactory<ToDoControlsViewModel>
 
-  private val _showEditToDoDialog = SingleLiveEvent<Unit>()
-  val showEditToDoDialog: LiveData<Unit>
-    get() = _showEditToDoDialog
+    private val _showEditToDoDialog = SingleLiveEvent<Unit>()
+    val showEditToDoDialog: LiveData<Unit>
+        get() = _showEditToDoDialog
 
-  private val _requestDeleteToDo = MutableLiveData<Long>()
-  val requestDeleteToDo: LiveData<Long>
-    get() = _requestDeleteToDo
+    private val _requestDeleteToDo = MutableLiveData<Long>()
+    val requestDeleteToDo: LiveData<Long>
+        get() = _requestDeleteToDo
 
-  fun onEditButtonClick() {
-    _showEditToDoDialog.call()
-  }
+    fun onEditButtonClick() {
+        _showEditToDoDialog.call()
+    }
 
-  fun onDeleteButtonClick(id: Long) {
-    _requestDeleteToDo.value = id
-  }
+    fun onDeleteButtonClick(id: Long) {
+        _requestDeleteToDo.value = id
+    }
 }

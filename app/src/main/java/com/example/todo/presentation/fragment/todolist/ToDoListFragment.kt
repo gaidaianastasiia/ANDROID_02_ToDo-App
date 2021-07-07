@@ -31,15 +31,6 @@ class ToDoListFragment :
         viewModel.requestList()
     }
 
-    override fun onToDoClick(id: Long, doneStatus: Boolean) {
-        viewModel.onClick(id, doneStatus)
-    }
-
-
-    override fun onToDoLongClick(id: Long, text: String) {
-        viewModel.onLongClick(id)
-    }
-
     private fun setAdapter() {
         val recyclerView = binding.listRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
@@ -101,6 +92,14 @@ class ToDoListFragment :
         binding.addNewToDoFloatingActionButton.setOnClickListener {
             viewModel.onAddNewToDoButtonClick()
         }
+    }
+
+    override fun onToDoClick(id: Long, doneStatus: Boolean) {
+        viewModel.onClick(id, doneStatus)
+    }
+
+    override fun onToDoLongClick(id: Long, text: String) {
+        viewModel.onLongClick(id)
     }
 
     private fun showCreateToDoDialog() {

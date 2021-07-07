@@ -17,112 +17,115 @@ private const val TEXT_ARGUMENT_KEY = "TEXT_ARGUMENT_KEY"
 const val EDIT_TO_DO_DIALOG_RESULT_KEY = "EDIT_TO_DO_DIALOG_RESULT_KEY"
 
 class ToDoDialogFragment :
-  BaseDialogFragment<ToDoDialogViewModel, ToDoDialogViewModel.Factory, FragmentToDoDialogBinding>() {
-  override fun onCreateDialog(savedInstanceState: Bundle?) = AppCompatDialog(requireContext())
+    BaseDialogFragment<ToDoDialogViewModel, ToDoDialogViewModel.Factory, FragmentToDoDialogBinding>() {
+    override fun onCreateDialog(savedInstanceState: Bundle?) = AppCompatDialog(requireContext())
 
-  override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-    super.onViewCreated(view, savedInstanceState)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
-    if (isEditableState()) {
-      setEditableState()
-    } else {
-      setCreatableState()
+        if (isEditableState()) {
+            setEditableState()
+        } else {
+            setCreatableState()
+        }
+
+        isCancelable = true
+
+        setObserve()
+        setClickListeners()
     }
 
-    isCancelable = true
+    private fun setObserve() {
+        viewModel.text.observe(viewLifecycleOwner) { text ->
+            if (isEditableState()) {
+                editToDo(text)
+            } else {
+                createToDo(text)
+            }
+        }
 
-    binding.positiveButton.setOnClickListener {
-      val toDoText = binding.toDoEditText.text.toString()
-      viewModel.onToDoDialogPositiveClick(toDoText)
-      dismiss()
+        viewModel.storageSuccessResponse.observe(viewLifecycleOwner) {
+            setFragmentResult(EDIT_TO_DO_DIALOG_RESULT_KEY, bundleOf())
+        }
+
+        viewModel.storageErrorResponse.observe(viewLifecycleOwner) {
+            showErrorMessage()
+        }
     }
 
-    binding.negativeButton.setOnClickListener {
-      dismiss()
+    private fun setClickListeners() {
+        binding.positiveButton.setOnClickListener {
+            val toDoText = binding.toDoEditText.text.toString()
+            viewModel.onToDoDialogPositiveClick(toDoText)
+            dismiss()
+        }
+
+        binding.negativeButton.setOnClickListener {
+            dismiss()
+        }
     }
 
-    setObserve()
-  }
+    private fun isEditableState() = getToDoId() != null
 
-  private fun setObserve() {
-    viewModel.text.observe(viewLifecycleOwner) { text ->
-      if (isEditableState()) {
-        editToDo(text)
-      } else {
-        createToDo(text)
-      }
+    private fun setCreatableState() {
+        val title = getString(R.string.create_to_do_dialog_title)
+        val positiveButtonText = getString(R.string.create_to_do_dialog_positive_button)
+
+        setTitle(title)
+        setPositiveButtonText(positiveButtonText)
     }
 
-    viewModel.storageSuccessResponse.observe(viewLifecycleOwner) {
-      setFragmentResult(EDIT_TO_DO_DIALOG_RESULT_KEY, bundleOf())
+    private fun setEditableState() {
+        val title = getString(R.string.edit_to_do_dialog_title)
+        val currentToDoText = getToDoText()
+        val positiveButtonText = getString(R.string.edit_to_do_dialog_positive_button)
+
+        setTitle(title)
+        setCurrentToDoText(currentToDoText)
+        setPositiveButtonText(positiveButtonText)
     }
 
-    viewModel.storageErrorResponse.observe(viewLifecycleOwner) {
-      showErrorMessage()
+    private fun setTitle(title: String) {
+        binding.toDoDialogTitleTextView.text = title
     }
-  }
 
-  private fun isEditableState() = getToDoId() != null
-
-  private fun getToDoId() = arguments?.getLong(ID_ARGUMENT_KEY)
-
-  private fun getToDoText() = arguments?.getString(TEXT_ARGUMENT_KEY) ?: ""
-
-  private fun setCreatableState() {
-    val title = getString(R.string.create_to_do_dialog_title)
-    val positiveButtonText = getString(R.string.create_to_do_dialog_positive_button)
-
-    setTitle(title)
-    setPositiveButtonText(positiveButtonText)
-  }
-
-  private fun setEditableState() {
-    val title = getString(R.string.edit_to_do_dialog_title)
-    val currentToDoText = getToDoText()
-    val positiveButtonText = getString(R.string.edit_to_do_dialog_positive_button)
-
-    setTitle(title)
-    setCurrentToDoText(currentToDoText)
-    setPositiveButtonText(positiveButtonText)
-  }
-
-  private fun setTitle(title: String) {
-    binding.toDoDialogTitleTextView.text = title
-  }
-
-  private fun setCurrentToDoText(currentText: String) {
-    binding.toDoEditText.run {
-      setText(currentText)
+    private fun setCurrentToDoText(currentText: String) {
+        binding.toDoEditText.run {
+            setText(currentText)
+        }
     }
-  }
 
-  private fun setPositiveButtonText(positiveButtonText: String) {
-    binding.positiveButton.text = positiveButtonText
-  }
-
-  private fun createToDo(text: String) {
-    viewModel.createToDo(text)
-  }
-
-  private fun editToDo(text: String) {
-    getToDoId()?.let { id ->
-      viewModel.editToDo(id, text)
+    private fun setPositiveButtonText(positiveButtonText: String) {
+        binding.positiveButton.text = positiveButtonText
     }
-  }
 
-  companion object {
-    fun getInstance(id: Long, text: String) = ToDoDialogFragment().apply {
-      arguments = bundleOf(
-        Pair(ID_ARGUMENT_KEY, id),
-        Pair(TEXT_ARGUMENT_KEY, text)
-      )
+    private fun createToDo(text: String) {
+        viewModel.createToDo(text)
     }
-  }
 
-  override val viewModelClass: KClass<ToDoDialogViewModel> = ToDoDialogViewModel::class
+    private fun editToDo(text: String) {
+        getToDoId()?.let { id ->
+            viewModel.editToDo(id, text)
+        }
+    }
 
-  override fun createViewBinding(
-    inflater: LayoutInflater,
-    parent: ViewGroup?
-  ): FragmentToDoDialogBinding = FragmentToDoDialogBinding.inflate(inflater, parent, false)
+    private fun getToDoId() = arguments?.getLong(ID_ARGUMENT_KEY)
+
+    private fun getToDoText() = arguments?.getString(TEXT_ARGUMENT_KEY) ?: ""
+
+    companion object {
+        fun getInstance(id: Long, text: String) = ToDoDialogFragment().apply {
+            arguments = bundleOf(
+                Pair(ID_ARGUMENT_KEY, id),
+                Pair(TEXT_ARGUMENT_KEY, text)
+            )
+        }
+    }
+
+    override val viewModelClass: KClass<ToDoDialogViewModel> = ToDoDialogViewModel::class
+
+    override fun createViewBinding(
+        inflater: LayoutInflater,
+        parent: ViewGroup?
+    ): FragmentToDoDialogBinding = FragmentToDoDialogBinding.inflate(inflater, parent, false)
 }
