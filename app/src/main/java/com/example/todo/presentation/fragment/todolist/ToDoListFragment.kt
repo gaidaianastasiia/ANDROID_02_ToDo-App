@@ -1,5 +1,6 @@
 package com.example.todo.presentation.fragment.todolist
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -23,24 +24,11 @@ class ToDoListFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         setAdapter()
         setObserve()
-
-        setFragmentResultListener(EDIT_TO_DO_DIALOG_RESULT_KEY) { _, _ ->
-            viewModel.requestList()
-        }
-
-        setFragmentResultListener((DELETE_TO_DO_REQUEST_KEY)) { _, bundle ->
-            val id = bundle.getLong(DELETED_TO_DO_ID)
-            viewModel.onDeleteRequest(id)
-        }
-
+        setFragmentResultListeners()
+        setClickListeners()
         viewModel.requestList()
-
-        binding.addNewToDoFloatingActionButton.setOnClickListener {
-            viewModel.onAddNewToDoButtonClick()
-        }
     }
 
     override fun onToDoClick(id: Long, doneStatus: Boolean) {
@@ -92,6 +80,27 @@ class ToDoListFragment :
         viewModel.hideLoader.observe(viewLifecycleOwner) {
             hideLoader()
         }
+
+        viewModel.showErrorMessage.observe(viewLifecycleOwner) {
+            showErrorMessage()
+        }
+    }
+
+    private fun setFragmentResultListeners() {
+        setFragmentResultListener(EDIT_TO_DO_DIALOG_RESULT_KEY) { _, _ ->
+            viewModel.requestList()
+        }
+
+        setFragmentResultListener((DELETE_TO_DO_REQUEST_KEY)) { _, bundle ->
+            val id = bundle.getLong(DELETED_TO_DO_ID)
+            viewModel.onDeleteRequest(id)
+        }
+    }
+
+    private fun setClickListeners() {
+        binding.addNewToDoFloatingActionButton.setOnClickListener {
+            viewModel.onAddNewToDoButtonClick()
+        }
     }
 
     private fun showCreateToDoDialog() {
@@ -104,6 +113,7 @@ class ToDoListFragment :
         controlsToDoDialog.show(parentFragmentManager, TO_DO_CONTROLS_FRAGMENT_TAG)
     }
 
+    @SuppressLint("ShowToast")
     private fun showRecoverDeletedTodoMessage(id: Long) {
         Snackbar.make(binding.root, RECOVER_DELETE_TO_DO_MESSAGE, Snackbar.LENGTH_LONG)
             .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
