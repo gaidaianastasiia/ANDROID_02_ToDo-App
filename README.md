@@ -1,5 +1,5 @@
 # ToDoApp
-- Basic CRUD application.
+Basic CRUD application.
 - Were used:
 - The Clean Architecture
 - The Model-View-ViewModel Pattern
