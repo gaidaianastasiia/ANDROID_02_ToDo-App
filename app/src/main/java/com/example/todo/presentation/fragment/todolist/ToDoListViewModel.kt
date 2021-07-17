@@ -1,6 +1,5 @@
 package com.example.todo.presentation.fragment.todolist
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
@@ -30,29 +29,17 @@ class ToDoListViewModel @AssistedInject constructor(
     @AssistedFactory
     interface Factory : BaseViewModelAssistedFactory<ToDoListViewModel>
 
-    private val _showEmptyState = SingleLiveEvent<Unit>()
-    val showEmptyState: LiveData<Unit>
+    private val _showEmptyState = MutableLiveData<Boolean>()
+    val showEmptyState: LiveData<Boolean>
         get() = _showEmptyState
 
-    private val _hideEmptyState = SingleLiveEvent<Unit>()
-    val hideEmptyState: LiveData<Unit>
-        get() = _hideEmptyState
-
-    private val _showLoader = SingleLiveEvent<Unit>()
-    val showLoader: LiveData<Unit>
+    private val _showLoader = MutableLiveData<Boolean>()
+    val showLoader: LiveData<Boolean>
         get() = _showLoader
 
-    private val _hideLoader = SingleLiveEvent<Unit>()
-    val hideLoader: LiveData<Unit>
-        get() = _hideLoader
-
-    private val _showErrorMessage = SingleLiveEvent<Unit>()
-    val showErrorMessage: LiveData<Unit>
-        get() = _showErrorMessage
-
-    private val _list = MutableLiveData<List<ToDo>>()
-    val list: LiveData<List<ToDo>>
-        get() = _list
+    private val _toDoList = MutableLiveData<List<ToDo>>()
+    val toDoList: LiveData<List<ToDo>>
+        get() = _toDoList
 
     private val _showCreateToDoDialog = SingleLiveEvent<Unit>()
     val showCreateToDoDialog: LiveData<Unit>
@@ -65,6 +52,8 @@ class ToDoListViewModel @AssistedInject constructor(
     private val _showRecoverDeletedTodoMessage = MutableLiveData<Long>()
     val showRecoverDeletedTodoMessage: LiveData<Long>
         get() = _showRecoverDeletedTodoMessage
+
+    private var deletedToDoId: Long? = null
 
     fun requestList() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -97,16 +86,11 @@ class ToDoListViewModel @AssistedInject constructor(
     }
 
     fun onDeleteRequest(id: Long) {
-        _showLoader.call()
+        _showLoader.value = true
+        deletedToDoId = id
 
         viewModelScope.launch(Dispatchers.IO) {
-            getAllToDos.invoke()
-                .doOnSuccess { list ->
-                    val updatedList = list.toMutableList()
-                    updatedList.removeIf { it.id == id }
-                    updateList(updatedList)
-                }
-                .doOnError { error -> onStorageError(error) }
+            fetchList()
 
             withContext(Dispatchers.Main) {
                 _showRecoverDeletedTodoMessage.value = id
@@ -116,13 +100,22 @@ class ToDoListViewModel @AssistedInject constructor(
 
     fun delete(id: Long) {
         viewModelScope.launch(Dispatchers.IO) {
+            deletedToDoId = null
             deleteToDo(id).doOnError { error -> onStorageError(error) }
+        }
+    }
+
+    fun cancelDelete() {
+        deletedToDoId = null
+
+        viewModelScope.launch(Dispatchers.IO) {
+            fetchList()
         }
     }
 
     private suspend fun fetchList() {
         viewModelScope.launch(Dispatchers.Main) {
-            _showLoader.call()
+            _showLoader.value = true
         }
 
         getAllToDos.invoke()
@@ -134,21 +127,13 @@ class ToDoListViewModel @AssistedInject constructor(
 
     private fun updateList(list: List<ToDo>) {
         viewModelScope.launch(Dispatchers.Main) {
-            if (list.isEmpty()) {
-                _showEmptyState.call()
-            } else {
-                _hideEmptyState.call()
-            }
+            val filteredList = if (deletedToDoId != null) {
+                list.toMutableList().filter { it.id != deletedToDoId }
+            } else null
 
-            _hideLoader.call()
-            _list.value = list
-        }
-    }
-
-    private fun onStorageError(error: Throwable) {
-        viewModelScope.launch(Dispatchers.Main) {
-            _showErrorMessage.call()
-            Log.e(this::class.simpleName, error.toString())
+            _showEmptyState.value = filteredList?.isEmpty() ?: list.isEmpty()
+            _showLoader.value = false
+            _toDoList.value = filteredList ?: list
         }
     }
 }

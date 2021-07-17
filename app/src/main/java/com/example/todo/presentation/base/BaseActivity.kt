@@ -15,14 +15,14 @@ abstract class BaseActivity<
         VMAF : ViewModelAssistedFactory<VM>,
         VB : ViewBinding
         > : DaggerAppCompatActivity() {
+    private var viewBinding: VB? = null
+    protected val binding: VB
+        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
+
     @Inject
     protected lateinit var viewModelAssistedFactory: VMAF
 
     protected abstract val viewModelClass: KClass<VM>
-
-    private var viewBinding: VB? = null
-    val binding: VB
-        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

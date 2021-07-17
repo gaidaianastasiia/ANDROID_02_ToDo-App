@@ -14,15 +14,25 @@ import dagger.android.support.DaggerDialogFragment
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-abstract class BaseDialogFragment<VM: BaseViewModel, VMAF: ViewModelAssistedFactory<VM>, VB: ViewBinding> : DaggerDialogFragment() {
+abstract class BaseDialogFragment<
+        VM : BaseViewModel,
+        VMAF : ViewModelAssistedFactory<VM>,
+        VB : ViewBinding> : DaggerDialogFragment() {
+    private var viewBinding: VB? = null
+    protected val binding: VB
+        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
+
     @Inject
     protected lateinit var viewModelAssistedFactory: VMAF
 
     protected abstract val viewModelClass: KClass<VM>
 
-    private var viewBinding: VB? = null
-    val binding: VB
-        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
+    protected val viewModel: VM by lazy {
+        ViewModelProvider(
+            this,
+            ViewModelFactory(this, null, viewModelFactory())
+        ).get(viewModelClass.java)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,15 +50,8 @@ abstract class BaseDialogFragment<VM: BaseViewModel, VMAF: ViewModelAssistedFact
         parent: ViewGroup?
     ): VB
 
-    protected val viewModel: VM by lazy {
-        ViewModelProvider(
-            this,
-            ViewModelFactory(this, null, viewModelFactory())
-        ).get(viewModelClass.java)
-    }
-
     protected open fun viewModelFactory(): (SavedStateHandle) -> ViewModel = { savedStateHandle ->
-        viewModelAssistedFactory.let {  assistedFactory ->
+        viewModelAssistedFactory.let { assistedFactory ->
             if (assistedFactory is BaseViewModelAssistedFactory<*>) {
                 assistedFactory.create(savedStateHandle)
             } else {

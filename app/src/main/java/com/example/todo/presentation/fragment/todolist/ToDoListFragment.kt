@@ -1,6 +1,5 @@
 package com.example.todo.presentation.fragment.todolist
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,8 +18,19 @@ private const val TO_DO_CONTROLS_FRAGMENT_TAG = "TO_DO_CONTROLS_FRAGMENT_TAG"
 private const val RECOVER_DELETE_TO_DO_MESSAGE = "To-Do has been removed"
 
 class ToDoListFragment :
-    BaseFragment<ToDoListViewModel, ToDoListViewModel.Factory, FragmentToDoListBinding>(),
-    ToDoAdapter.ToDoAdapterListener {
+    BaseFragment<
+            ToDoListViewModel,
+            ToDoListViewModel.Factory,
+            FragmentToDoListBinding
+            >(),
+    ToDoAdapter.OnItemClickListener {
+    private lateinit var adapter: ToDoAdapter
+    override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class
+
+    override fun createViewBinding(
+        inflater: LayoutInflater,
+        parent: ViewGroup?
+    ): FragmentToDoListBinding = FragmentToDoListBinding.inflate(inflater, parent, false)
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -31,19 +41,26 @@ class ToDoListFragment :
         viewModel.requestList()
     }
 
+    override fun onItemClick(id: Long, doneStatus: Boolean) {
+        viewModel.onClick(id, doneStatus)
+    }
+
+    override fun onItemLongClick(id: Long, text: String) {
+        viewModel.onLongClick(id)
+    }
+
     private fun setAdapter() {
         val recyclerView = binding.listRecyclerView
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
-
-        val adapter = ToDoAdapter(this)
+        adapter = ToDoAdapter(this)
         recyclerView.adapter = adapter
-
-        viewModel.list.observe(viewLifecycleOwner) {
-            adapter.submitList(it)
-        }
     }
 
     private fun setObserve() {
+        viewModel.toDoList.observe(viewLifecycleOwner) {
+            adapter.submitList(it)
+        }
+
         viewModel.showCreateToDoDialog.observe(viewLifecycleOwner) {
             showCreateToDoDialog()
         }
@@ -56,23 +73,15 @@ class ToDoListFragment :
             showRecoverDeletedTodoMessage(it)
         }
 
-        viewModel.showEmptyState.observe(viewLifecycleOwner) {
-            showEmptyState()
+        viewModel.showEmptyState.observe(viewLifecycleOwner) { isEmptyStateVisible ->
+            showEmptyState(isEmptyStateVisible)
         }
 
-        viewModel.hideEmptyState.observe(viewLifecycleOwner) {
-            hideEmptyState()
+        viewModel.showLoader.observe(viewLifecycleOwner) { isLoaderVisible ->
+            showLoader(isLoaderVisible)
         }
 
-        viewModel.showLoader.observe(viewLifecycleOwner) {
-            showLoader()
-        }
-
-        viewModel.hideLoader.observe(viewLifecycleOwner) {
-            hideLoader()
-        }
-
-        viewModel.showErrorMessage.observe(viewLifecycleOwner) {
+        viewModel.storageErrorResponse.observe(viewLifecycleOwner) {
             showErrorMessage()
         }
     }
@@ -94,14 +103,6 @@ class ToDoListFragment :
         }
     }
 
-    override fun onToDoClick(id: Long, doneStatus: Boolean) {
-        viewModel.onClick(id, doneStatus)
-    }
-
-    override fun onToDoLongClick(id: Long, text: String) {
-        viewModel.onLongClick(id)
-    }
-
     private fun showCreateToDoDialog() {
         val createToDoDialog = ToDoDialogFragment()
         createToDoDialog.show(parentFragmentManager, CREATE_TODO_FRAGMENT_DIALOG_TAG)
@@ -112,7 +113,6 @@ class ToDoListFragment :
         controlsToDoDialog.show(parentFragmentManager, TO_DO_CONTROLS_FRAGMENT_TAG)
     }
 
-    @SuppressLint("ShowToast")
     private fun showRecoverDeletedTodoMessage(id: Long) {
         Snackbar.make(binding.root, RECOVER_DELETE_TO_DO_MESSAGE, Snackbar.LENGTH_LONG)
             .addCallback(object : BaseTransientBottomBar.BaseCallback<Snackbar>() {
@@ -123,30 +123,23 @@ class ToDoListFragment :
                     }
                 }
             })
-            .setAction(R.string.recover_button) { viewModel.requestList() }
+            .setAction(R.string.recover_button) { viewModel.cancelDelete() }
             .show()
     }
 
-    private fun showEmptyState() {
-        binding.emptyStateTextView.visibility = View.VISIBLE
+    private fun showEmptyState(isEmptyStateVisible: Boolean) {
+        if(isEmptyStateVisible) {
+            binding.emptyStateTextView.visibility = View.VISIBLE
+        } else {
+            binding.emptyStateTextView.visibility = View.GONE
+        }
     }
 
-    private fun hideEmptyState() {
-        binding.emptyStateTextView.visibility = View.GONE
+    private fun showLoader(isLoaderVisible: Boolean) {
+        if (isLoaderVisible) {
+            binding.progressBar.visibility = View.VISIBLE
+        } else {
+            binding.progressBar.visibility = View.GONE
+        }
     }
-
-    private fun showLoader() {
-        binding.progressBar.visibility = View.VISIBLE
-    }
-
-    private fun hideLoader() {
-        binding.progressBar.visibility = View.GONE
-    }
-
-    override val viewModelClass: KClass<ToDoListViewModel> = ToDoListViewModel::class
-
-    override fun createViewBinding(
-        inflater: LayoutInflater,
-        parent: ViewGroup?
-    ): FragmentToDoListBinding = FragmentToDoListBinding.inflate(inflater, parent, false)
 }

@@ -11,7 +11,7 @@ import javax.inject.Singleton
 class StorageModule {
     @Provides
     @Singleton
-    fun provideDataBase(context: Context) =
+    fun provideDataBase(context: Context): ApplicationDatabase =
         Room.databaseBuilder(
             context,
             ApplicationDatabase::class.java,

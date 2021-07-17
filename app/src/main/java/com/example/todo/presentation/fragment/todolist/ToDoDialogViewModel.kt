@@ -1,14 +1,14 @@
 package com.example.todo.presentation.fragment.todolist
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
+import com.example.todo.R
 import com.example.todo.domain.InsertToDoInteractor
 import com.example.todo.domain.UpdateToDoTextInteractor
 import com.example.todo.presentation.base.BaseViewModel
-import com.example.todo.presentation.base.BaseViewModelAssistedFactory
+import com.example.todo.presentation.base.ViewModelAssistedFactory
 import com.example.todo.presentation.utils.SingleLiveEvent
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -21,36 +21,70 @@ private const val TEXT_STATE_KEY = "TEXT_STATE_KEY"
 
 class ToDoDialogViewModel @AssistedInject constructor(
     @Assisted savedStateHandle: SavedStateHandle,
+    @Assisted private val id: Long?,
+    @Assisted currentText: String?,
     private val create: InsertToDoInteractor,
     private val edit: UpdateToDoTextInteractor
 ) : BaseViewModel(savedStateHandle) {
     @AssistedFactory
-    interface Factory : BaseViewModelAssistedFactory<ToDoDialogViewModel>
+    interface Factory : ViewModelAssistedFactory<ToDoDialogViewModel> {
+        fun create(
+            savedStateHandle: SavedStateHandle,
+            id: Long?,
+            currentText: String?
+        ): ToDoDialogViewModel
+    }
 
-    private val _text = MutableLiveData<String>()
-    val text: LiveData<String>
-        get() = _text
+    private val _dialogTitle = MutableLiveData<Int>()
+    val dialogTitle: LiveData<Int>
+        get() = _dialogTitle
+
+    private val _positiveButtonText = MutableLiveData<Int>()
+    val positiveButtonText: LiveData<Int>
+        get() = _positiveButtonText
+
+    private val _enteredText = MutableLiveData<String>()
+    val enteredText: LiveData<String>
+        get() = _enteredText
 
     private val _storageSuccessResponse = SingleLiveEvent<Unit>()
     val storageSuccessResponse: LiveData<Unit>
         get() = _storageSuccessResponse
 
-    private val _storageErrorResponse = SingleLiveEvent<Unit>()
-    val storageErrorResponse: LiveData<Unit>
-        get() = _storageErrorResponse
-
     init {
+        if (id == null) {
+            _dialogTitle.value = R.string.create_to_do_dialog_title
+            _positiveButtonText.value = R.string.create_to_do_dialog_positive_button
+        } else {
+            _dialogTitle.value = R.string.edit_to_do_dialog_title
+            _positiveButtonText.value = R.string.edit_to_do_dialog_positive_button
+        }
+
+        currentText?.let {
+            _enteredText.value = it
+        }
+
         savedStateHandle.get<String>(TEXT_STATE_KEY)?.let {
-            _text.value = it
+            _enteredText.value = it
         }
     }
 
-    fun onToDoDialogPositiveClick(text: String) {
-        _text.value = text
+    fun saveEnteredText(text: String) {
+        _enteredText.value = text
         savedStateHandle.set(TEXT_STATE_KEY, text)
     }
 
-    fun createToDo(text: String) {
+    fun onToDoDialogPositiveClick() {
+        _enteredText.value?.let { text ->
+            if (id == null) {
+                createToDo(text)
+            } else {
+                editToDo(text)
+            }
+        }
+    }
+
+    private fun createToDo(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
             create(text)
                 .doOnSuccess {
@@ -62,22 +96,17 @@ class ToDoDialogViewModel @AssistedInject constructor(
         }
     }
 
-    fun editToDo(id: Long, text: String) {
+    private fun editToDo(text: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            edit(id, text)
-                .doOnSuccess {
-                    withContext(Dispatchers.Main) {
-                        _storageSuccessResponse.call()
+            id?.let { id ->
+                edit(id, text)
+                    .doOnSuccess {
+                        withContext(Dispatchers.Main) {
+                            _storageSuccessResponse.call()
+                        }
                     }
-                }
-                .doOnError { error -> onStorageError(error) }
-        }
-    }
-
-    private fun onStorageError(error: Throwable) {
-        viewModelScope.launch(Dispatchers.Main) {
-            _storageErrorResponse.call()
-            Log.e(this::class.simpleName, error.toString())
+                    .doOnError { error -> onStorageError(error) }
+            }
         }
     }
 }

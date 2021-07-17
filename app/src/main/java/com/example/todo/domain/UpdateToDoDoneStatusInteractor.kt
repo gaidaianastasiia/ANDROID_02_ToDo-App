@@ -6,6 +6,6 @@ import javax.inject.Inject
 class UpdateToDoDoneStatusInteractor @Inject constructor(
     private val repository: ToDoRepository
 ) {
-    suspend operator fun invoke(id: Long, updatedDoneStatus: Boolean) =
-        repository.updateDoneStatus(id, updatedDoneStatus)
+    suspend operator fun invoke(id: Long, doneStatus: Boolean) =
+        repository.updateDoneStatus(id, doneStatus)
 }

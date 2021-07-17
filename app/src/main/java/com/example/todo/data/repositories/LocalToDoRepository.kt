@@ -25,7 +25,6 @@ class LocalToDoRepository @Inject constructor(
             Result.Error(e)
         }
 
-
     override suspend fun insert(text: String): Result<Unit> {
         val newTodo = ToDoData(text, false)
         return try {

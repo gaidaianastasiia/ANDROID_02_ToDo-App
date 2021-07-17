@@ -14,16 +14,19 @@ import dagger.android.support.DaggerFragment
 import javax.inject.Inject
 import kotlin.reflect.KClass
 
-abstract class BaseFragment<VM : BaseViewModel, VMAF : ViewModelAssistedFactory<VM>, VB : ViewBinding> :
-    DaggerFragment() {
+abstract class BaseFragment<
+        VM : BaseViewModel,
+        VMAF : ViewModelAssistedFactory<VM>,
+        VB : ViewBinding
+        > : DaggerFragment() {
+    private var viewBinding: VB? = null
+    protected val binding: VB
+        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
+
     @Inject
     protected lateinit var viewModelAssistedFactory: VMAF
 
     protected abstract val viewModelClass: KClass<VM>
-
-    private var viewBinding: VB? = null
-    val binding: VB
-        get() = viewBinding ?: throw IllegalStateException("View binding is not initialized")
 
     override fun onCreateView(
         inflater: LayoutInflater,

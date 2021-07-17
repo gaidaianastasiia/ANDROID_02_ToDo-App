@@ -9,7 +9,8 @@ import dagger.android.support.AndroidSupportInjection
 import javax.inject.Inject
 
 open class DaggerBottomSheetDialogFragment: BottomSheetDialogFragment(), HasAndroidInjector {
-    @Inject lateinit var androidInjector: DispatchingAndroidInjector<Any?>
+    @Inject
+    lateinit var androidInjector: DispatchingAndroidInjector<Any?>
 
     override fun onAttach(context: Context) {
         AndroidSupportInjection.inject(this)

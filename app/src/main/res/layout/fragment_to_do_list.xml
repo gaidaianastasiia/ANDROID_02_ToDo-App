@@ -7,7 +7,7 @@
     android:padding="30dp"
     tools:context=".presentation.fragment.todolist.ToDoListFragment">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/titleTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,7 +40,7 @@
         android:layout_marginEnd="10dp"
         android:layout_marginBottom="10dp"
         android:contentDescription="@string/add_button_description"
-        android:src="@drawable/ic_baseline_add_24"
+        android:src="@drawable/ic_add_24"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 

@@ -19,11 +19,11 @@ private val DIFF_CALLBACK: DiffUtil.ItemCallback<ToDo> = object : DiffUtil.ItemC
 }
 
 class ToDoAdapter(
-    private val toDoAdapterListener: ToDoAdapterListener
+    private val onItemClickListener: OnItemClickListener
 ) : ListAdapter<ToDo, ToDoAdapter.ViewHolder>(DIFF_CALLBACK) {
-    interface ToDoAdapterListener {
-        fun onToDoClick(id: Long, doneStatus: Boolean)
-        fun onToDoLongClick(id: Long, text: String)
+    interface OnItemClickListener {
+        fun onItemClick(id: Long, doneStatus: Boolean)
+        fun onItemLongClick(id: Long, text: String)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -36,23 +36,24 @@ class ToDoAdapter(
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val id = getItem(position).id
-        val text = getItem(position).text
-        val doneStatus = getItem(position).doneStatus
+        val toDo = getItem(position)
+        val id = toDo.id
+        val text = toDo.text
+        val doneStatus = toDo.doneStatus
 
-        holder.bind(text, doneStatus)
+        holder.bind(toDo)
 
         holder.itemBinding.root.setOnClickListener {
-            toDoAdapterListener.onToDoClick(id, doneStatus)
+            onItemClickListener.onItemClick(id, doneStatus)
         }
 
         holder.itemBinding.root.setOnLongClickListener {
-            toDoAdapterListener.onToDoLongClick(id, text)
+            onItemClickListener.onItemLongClick(id, text)
             true
         }
 
         holder.itemBinding.itemDoneStatusCheckBox.setOnClickListener {
-            toDoAdapterListener.onToDoClick(id, doneStatus)
+            onItemClickListener.onItemClick(id, doneStatus)
         }
     }
 
@@ -60,9 +61,9 @@ class ToDoAdapter(
         val itemBinding: ToDoListItemLayoutBinding
     ) : RecyclerView.ViewHolder(itemBinding.root) {
 
-        fun bind(toDoText: String, doneStatus: Boolean) {
-            itemBinding.itemTextTextView.text = toDoText
-            itemBinding.itemDoneStatusCheckBox.isChecked = doneStatus
+        fun bind(toDo: ToDo) {
+            itemBinding.itemTextTextView.text = toDo.text
+            itemBinding.itemDoneStatusCheckBox.isChecked = toDo.doneStatus
         }
     }
 }
