@@ -3,6 +3,7 @@ package com.example.todo.di.module
 import android.content.Context
 import androidx.room.Room
 import com.example.todo.data.ApplicationDatabase
+import com.example.todo.data.dao.ToDoDao
 import dagger.Module
 import dagger.Provides
 import javax.inject.Singleton
@@ -20,5 +21,5 @@ class StorageModule {
 
     @Provides
     @Singleton
-    fun provideToDoDao(database: ApplicationDatabase) = database.toDoDao()
+    fun provideToDoDao(database: ApplicationDatabase): ToDoDao = database.toDoDao()
 }
