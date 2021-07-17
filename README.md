@@ -5,5 +5,4 @@ Basic CRUD application.
 - The Model-View-ViewModel Pattern
 - Dagger
 - Room
-- Coroutines
-*
+- Coroutines*
