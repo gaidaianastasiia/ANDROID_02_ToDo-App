@@ -1,3 +1,23 @@
 <resources>
     <string name="app_name">ToDo</string>
+
+    <!--  common  -->
+    <string name="add_button_description">Add</string>
+    <string name="retry_button">Retry</string>
+    <string name="recover_button">Recover</string>
+    <string name="cancel_button">Cancel</string>
+    <string name="edit_button">Edit</string>
+    <string name="delete_button">Delete</string>
+    <string name="empty_state_message">The list is empty</string>
+    <string name="error_message">Oops! Something went wrong</string>
+
+    <!--  fragment_to_do_list  -->
+    <string name="to_do_list_title">To-do list</string>
+
+    <!--  fragment_to_do_dialog  -->
+    <string name="to_do_editText_text_hint">Text</string>
+    <string name="create_to_do_dialog_title">New To-Do</string>
+    <string name="edit_to_do_dialog_title">Edit To-Do</string>
+    <string name="create_to_do_dialog_positive_button">Add</string>
+    <string name="edit_to_do_dialog_positive_button">Save</string>
 </resources>
