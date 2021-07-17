@@ -1,5 +1,4 @@
 # ToDoApp
-```
 - Basic CRUD application.
 - Were used:
 - The Clean Architecture
@@ -7,4 +6,4 @@
 - Dagger
 - Room
 - Coroutines
-```
+
